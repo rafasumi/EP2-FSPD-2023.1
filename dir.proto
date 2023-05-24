@@ -1,0 +1,47 @@
+/* Arquivo de definição da interface entre 
+ * Versão 3 de protocol buffers 
+ */
+syntax = "proto3";
+
+package directory;
+
+service Directory {
+  rpc insert (InsertRequest) returns (InsertReply);
+  rpc search (SearchRequest) returns (SearchReply);
+  rpc register (RegisterRequest) returns (RegisterReply);
+  rpc finish (FinishRequest) returns (FinishReply);
+}
+
+message InsertRequest {
+  int32 key = 1;
+  string desc = 2;
+  float val = 3;
+}
+
+message InsertReply {
+  int32 ret_val = 1;
+}
+
+message SearchRequest {
+  int32 key = 1;
+}
+
+message SearchReply {
+  string desc = 1;
+  float val = 2;
+}
+
+message RegisterRequest {
+  string name = 1;
+  int32 port = 2;
+}
+
+message RegisterReply {
+  int32 ret_val = 1; // not sure about this
+}
+
+message FinishRequest {}
+
+message FinishReply {
+  int32 num_keys = 1;
+}
