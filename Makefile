@@ -17,5 +17,11 @@ run_cli_dir: stubs
 run_serv_dir: stubs
 	@python3 server_dir.py $(arg)
 
+run_cli_int: stubs
+	@python3 client_int.py $(arg)
+
+run_serv_int: stubs
+	@python3 server_int.py $(arg)
+
 clean:
 	@rm -f $(DIR_STUBS) $(INT_STUBS)

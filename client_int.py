@@ -2,6 +2,8 @@ from __future__ import print_function
 from sys import stdin, stderr, argv
 
 import grpc
+import int_pb2
+import int_pb2_grpc
 import dir_pb2
 import dir_pb2_grpc
 
@@ -21,7 +23,7 @@ def run():
     port = int(args[1])
 
     channel = grpc.insecure_channel(f'{addr}:{port}')
-    stub = dir_pb2_grpc.DirectoryStub(channel)
+    stub = int_pb2_grpc.IntegrationStub(channel)
 
     for line in stdin:
         # Remove espaços e quebras de linha do começo e final da string
@@ -29,29 +31,23 @@ def run():
 
         line = line.split(',')
         command = line[0]
-        if command == 'I':
-            key = int(line[1])
-            desc = line[2]
-            val = float(line[3])
-
-            response = stub.insert(dir_pb2.InsertRequest(key=key, desc=desc, val=val))
-            print(response.ret_val)
-        elif command == 'C':
+        if command == 'C':
             key = int(line[1])
 
-            response = stub.search(dir_pb2.SearchRequest(key=key))
-            if response.desc == '' and response.val == 0:
-                print(-1)
+            response = stub.search(int_pb2.SearchRequest(key=key))
+            if response.name == 'ND':
+                print(response.name)
             else:
-                print('{},{:7.4}'.format(response.desc, response.val))
-        elif command == 'R':
-            name = line[1]
-            serv_port = int(line[2])
+                dir_channel = grpc.insecure_channel(f'{response.name}:{response.port}')
+                dir_stub = dir_pb2_grpc.DirectoryStub(dir_channel)
 
-            response = stub.register(dir_pb2.RegisterRequest(name=name, port=serv_port))
-            print(response.ret_val)
+                dir_response = dir_stub.search(dir_pb2.SearchRequest(key=key))
+
+                dir_channel.close()
+                
+                print('{},{:7.4}'.format(dir_response.desc, dir_response.val))
         elif command == 'T':
-            response = stub.finish(dir_pb2.FinishRequest())
+            response = stub.finish(int_pb2.FinishRequest())
             print(response.num_keys)
         else:
             continue
