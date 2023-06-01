@@ -1,3 +1,5 @@
+"""Arquivo que implementa o cliente para o servidor de diretórios"""
+
 from __future__ import print_function
 from sys import stdin, stderr, argv
 
@@ -13,21 +15,26 @@ def usage():
 
 
 def run():
-    if len(argv) < 2:
+    if len(argv) != 2:
         usage()
 
     args = argv[1].split(':')
     addr = args[0]
     port = int(args[1])
 
+    # Abre canal de comunicação com o servidor e inicializa o stub.
     channel = grpc.insecure_channel(f'{addr}:{port}')
     stub = dir_pb2_grpc.DirectoryStub(channel)
 
+    # Lê todas as linhas na entrada padrão, até encontrar EOF.
     for line in stdin:
-        # Remove espaços e quebras de linha do começo e final da string
+        # Remove espaços e quebras de linha no começo e final da string.
         line = line.strip()
 
+        # Transforma string de entrada em uma lista com os parâmetros passados,
+        # assumindo que estão separados por vírgula.
         line = line.split(',')
+
         command = line[0]
         if command == 'I':
             key = int(line[1])
@@ -41,6 +48,7 @@ def run():
 
             response = stub.search(dir_pb2.SearchRequest(key=key))
             if response.desc == '' and response.val == 0:
+                # Chave não foi encontrada no servidor.
                 print(-1)
             else:
                 print('{},{:7.4}'.format(response.desc, response.val))
@@ -54,6 +62,7 @@ def run():
             response = stub.finish(dir_pb2.FinishRequest())
             print(response.num_keys)
         else:
+            # Comando inválido é ignorado.
             continue
 
     # Ao final o cliente pode fechar o canal para o servidor.

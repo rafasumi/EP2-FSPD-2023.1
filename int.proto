@@ -1,5 +1,5 @@
-/* Arquivo de definição da interface entre 
- * Versão 3 de protocol buffers 
+/* 
+ *  Arquivo de definição da interface para o servidor de integração.
  */
 syntax = "proto3";
 
@@ -11,27 +11,33 @@ service Integration {
   rpc finish (FinishRequest) returns (FinishReply);
 }
 
+// Parâmetros para o procedimento de registro.
 message RegisterRequest {
   string name = 1;
   int32 port = 2;
   repeated int32 keys = 3;
 }
 
+// Resposta do procedimento de registro.
 message RegisterReply {
   int32 ret_val = 1;
 }
 
+// Parâmetros para o procedimento de consulta.
 message SearchRequest {
   int32 key = 1;
 }
 
+// Resposta do procedimento de consulta.
 message SearchReply {
   string name = 1;
   int32 port = 2;
 }
 
+// O procedimento de término não recebe parâmetros.
 message FinishRequest {}
 
+// Resposta do procedimento de término.
 message FinishReply {
   int32 num_keys = 1;
 }
