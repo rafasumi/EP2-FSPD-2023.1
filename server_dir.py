@@ -81,8 +81,6 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
     # Evento usado para determinar quando o servidor deve parar de executar.
-    # Optei por usar um Event ao invés de uma variável de condição, pois não há
-    # nenhuma trava mutex associada a essa condição.
     finish_event = Event()
 
     dir_pb2_grpc.add_DirectoryServicer_to_server(Directory(port, finish_event), server)
